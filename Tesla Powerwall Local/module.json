@@ -1,0 +1,12 @@
+{
+    "id": "{7A4D22CA-C92F-2040-F2CE-9521748F5E11}",
+    "name": "Tesla Powerwall Local",
+    "url": "https://wilkware.de/ip-symcon-module/tesla-energiespeicher/",
+    "type": 3,
+    "vendor": "Tesla",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "TPWL"
+}
