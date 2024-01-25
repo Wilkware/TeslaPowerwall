@@ -9,7 +9,7 @@ Die Bibliothek startet mit dem lokalen API-Inteface. Ein Modul zur Nutzung der C
 
 Folgende Module beinhaltet diese Bibliothek:
 
-- __Tesla Energiespeicher (Lokal)__ ([Dokumentation](Tesla Powerwall Local))  
+- __Tesla Energiespeicher (Lokal)__ ([Dokumentation](Tesla%20Powerwall%20Local))  
     Abruf verschiedener Daten-Endpunkte über die lokale Schnittstelle.
 
 ## Historie
