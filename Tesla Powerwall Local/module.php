@@ -56,7 +56,7 @@ class TeslaPowerwallLocal extends IPSModule
         // The auth token is provided in the response to a successful login.
         $this->RegisterAttributeString('AuthToken', '');
         // The cookie file name.
-        $this->RegisterAttributeString('CookieFile', tempnam('/tmp', 'tpwl.'));
+        $this->RegisterAttributeString('CookieFile', @tempnam('/tmp', 'tpwl.'));
         // Account
         $this->RegisterPropertyString('Mail', '');
         $this->RegisterPropertyString('Password', '');
