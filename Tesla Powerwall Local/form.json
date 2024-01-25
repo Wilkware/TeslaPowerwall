@@ -39,7 +39,7 @@
                             "type": "PasswordTextBox",
                             "name": "Password",
                             "caption": "Customer Password:",
-                            "validate": "^(?=.*[A-Za-z])[A-Za-z]{8,}$",
+                            "validate": "^(?=.*[A-Za-z0-9])[A-Za-z0-9]{8,}$",
                             "width": "250px"
                         }
                     ]
