@@ -40,10 +40,11 @@ class TeslaPowerwallLocal extends IPSModule
     private const ELEM_DATA = 4;
     private const ELEM_ADVANCED = 5;
 
-    // API Endpoints (see )
+    // API Endpoints (see https://github.com/vloschiavo/powerwall2)
     private static $API_ENDPOINTS = [
-        ['Query' => true,  'Endpoint' => '/meters/aggregates', 'Method'=> 'GET',  'Description'=> 'Instantaneous readings from the CT clamps'],
-        ['Query' => false, 'Endpoint' => '/site_info',         'Method'=> 'GET',  'Description'=> 'High-level information about the location and the network to which the Powerwall is connected'],
+        ['Query' => true,  'Endpoint' => '/meters/aggregates', 'Method'=> 'GET', 'Restore' => true, 'Description'=> 'Instantaneous readings from the CT clamps'],
+        ['Query' => false, 'Endpoint' => '/site_info',         'Method'=> 'GET', 'Restore' => true, 'Description'=> 'High-level information about the location and the network to which the Powerwall is connected'],
+        ['Query' => false, 'Endpoint' => '/system_status/soe', 'Method'=> 'GET', 'Restore' => true, 'Description'=> 'Powerwall charged percentage'],
     ];
 
     /**
@@ -105,9 +106,7 @@ class TeslaPowerwallLocal extends IPSModule
         }
         //Only add default element if we do not have anything in persistence
         $endpoints = json_decode($this->ReadPropertyString('Endpoints'), true);
-        if (empty($endpoints)) {
-            $form['elements'][self::ELEM_DATA]['items'][0]['values'] = $this->GetEndpointValues();
-        }
+        $form['elements'][self::ELEM_DATA]['items'][0]['values'] = $this->GetEndpointValues($endpoints);
         //$this->SendDebug(__FUNCTION__, $form);
         return json_encode($form);
     }
@@ -172,18 +171,25 @@ class TeslaPowerwallLocal extends IPSModule
     }
 
     /**
-     * GetEndpointValues for form list
+     * Get endpoint values for form list
      *
+     * @param mixed $endpoints registered endpoint list
      * @return array List values
      */
-    protected function GetEndpointValues()
+    protected function GetEndpointValues($endpoints)
     {
-        $values = [];
+        $cols = array_column($endpoints, 'Endpoint');
         foreach (self::$API_ENDPOINTS as $value) {
             $value['Description'] = $this->Translate($value['Description']);
-            $values[] = $value;
+            // Is there a new endpoint added?
+            $key = array_search($value['Endpoint'], $cols);
+            if ($key !== false) {
+                $endpoints[$key]['Description'] = $value['Description'];
+            } else {
+                $endpoints[] = $value;
+            }
         }
-        return $values;
+        return $endpoints;
     }
 
     /**
@@ -336,7 +342,7 @@ class TeslaPowerwallLocal extends IPSModule
                     // Flag for upper case names?
                     $upper = $this->ReadPropertyBoolean('UppercaseMode');
                     // Update variables
-                    $this->CreateVariablesFromJson($params, $upper);
+                    $this->CreateVariablesFromJson($params, $call['Restore'], $upper);
                 }
             }
         }
@@ -346,10 +352,11 @@ class TeslaPowerwallLocal extends IPSModule
      * Create and update variables from json structure/response.
      *
      * @param JSON $json Json response answer
+     * @param bool $restore Indicator to restore deleted variables (reregister)
      * @param bool $case Indicator to upper case variable names
      * @param string $prefix Prefix fpr each variable name
      */
-    private function CreateVariablesFromJson($json, $case, $prefix = '')
+    private function CreateVariablesFromJson($json, $restore, $case, $prefix = '')
     {
         // Go through the values
         foreach ($json as $key => $value) {
@@ -361,14 +368,14 @@ class TeslaPowerwallLocal extends IPSModule
             // Check whether it is another array (JSON object)
             if (is_array($value)) {
                 // Recursively create the variables for the inner array
-                $this->CreateVariablesFromJson($value, $case, $name . '_');
+                $this->CreateVariablesFromJson($value, $restore, $case, $name . '_');
                 continue;
             }
             // Create ident from name
             $ident = $this->GetVariableIdent($name);
             // Check, if variable exist
             $vid = @$this->GetIDForIdent($ident);
-            if ($vid === false) {
+            if (($vid === false) && $restore) {
                 $type = $this->GetVariableType($value);
                 switch ($type) {
                     case 0: // boolean
@@ -388,8 +395,10 @@ class TeslaPowerwallLocal extends IPSModule
                         break;
                 }
             }
-            // Update the value of the variable
-            $this->SetValue($ident, $value);
+            // Update the value of the variable if registered
+            if ($vid !== false) {
+                $this->SetValue($ident, $value);
+            }
         }
     }
 

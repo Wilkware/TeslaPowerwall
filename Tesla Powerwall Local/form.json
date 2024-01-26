@@ -46,7 +46,7 @@
                 },
                 {
                     "type": "Label",
-                    "label": "\nMinimum eight characters, at least one uppercase letter and one lowercase letter!",
+                    "label": "\nAt least eight characters, capital letters, lower case letters and numbers are permitted!",
                     "italic": true
                 }
             ]
@@ -89,13 +89,22 @@
                             "name": "Endpoint",
                             "caption": "Endpoint:",
                             "save": true,
-                            "width": "300px"
+                            "width": "200px"
                         },
                         {
                             "name": "Method",
                             "caption": "Method:",
                             "save": true,
-                            "width": "150px"
+                            "width": "75px"
+                        },
+                        {
+                            "name": "Restore",
+                            "caption": "Restore:",
+                            "save": true,
+                            "width": "150px",
+                            "edit": {
+                                "type": "CheckBox"
+                            }
                         },
                         {
                             "name": "Description",
@@ -104,6 +113,11 @@
                             "width": "auto"
                         }
                     ]
+                },
+                {
+                    "type": "Button",
+                    "caption": "Endpoints documentation",
+                    "onClick": "echo 'https://github.com/vloschiavo/powerwall2?tab=readme-ov-file#overview-1';"
                 },
                 {
                     "type": "NumberSpinner",
