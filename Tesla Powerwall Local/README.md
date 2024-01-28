@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.1.20230126-orange.svg)](https://github.com/Wilkware/TeslaPowerwall)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.2.20230128-orange.svg)](https://github.com/Wilkware/TeslaPowerwall)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/TeslaPowerwall/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/TeslaPowerwall/actions)
 
@@ -91,6 +91,12 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 Das Modul stellt keine direkten Funktionsaufrufe zur Verfügung.
 
 ### 8. Versionshistorie
+
+v1.2.20240128
+
+* _NEU_: API-Endpunkt hinzugefügt (/meters/site und /meters/solar)
+* _NEU_: Liste wird jetzt sortiert nach Endpunkt-Spalte
+* _NEU_: Interne Präfix-Einstellung pro Endpunkt
 
 v1.1.20240126
 

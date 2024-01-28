@@ -42,9 +42,11 @@ class TeslaPowerwallLocal extends IPSModule
 
     // API Endpoints (see https://github.com/vloschiavo/powerwall2)
     private static $API_ENDPOINTS = [
-        ['Query' => true,  'Endpoint' => '/meters/aggregates', 'Method'=> 'GET', 'Restore' => true, 'Description'=> 'Instantaneous readings from the CT clamps'],
-        ['Query' => false, 'Endpoint' => '/site_info',         'Method'=> 'GET', 'Restore' => true, 'Description'=> 'High-level information about the location and the network to which the Powerwall is connected'],
-        ['Query' => false, 'Endpoint' => '/system_status/soe', 'Method'=> 'GET', 'Restore' => true, 'Description'=> 'Powerwall charged percentage'],
+        ['Query' => true,  'Endpoint' => '/meters/aggregates', 'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'Instantaneous readings from the CT clamps'],
+        ['Query' => false, 'Endpoint' => '/meters/site',       'Method'=> 'GET', 'Prefix' => 'site_',  'Restore' => true, 'Description'=> 'Detailed information about the site specific meter'],
+        ['Query' => false, 'Endpoint' => '/meters/solar',      'Method'=> 'GET', 'Prefix' => 'solar_', 'Restore' => true, 'Description'=> 'Detailed information about the solar specific meter'],
+        ['Query' => false, 'Endpoint' => '/site_info',         'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'High-level information about the location and the network to which the Powerwall is connected'],
+        ['Query' => false, 'Endpoint' => '/system_status/soe', 'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'Powerwall charged percentage'],
     ];
 
     /**
@@ -185,6 +187,7 @@ class TeslaPowerwallLocal extends IPSModule
             $key = array_search($value['Endpoint'], $cols);
             if ($key !== false) {
                 $endpoints[$key]['Description'] = $value['Description'];
+                $endpoints[$key]['Prefix'] = $value['Prefix'];
             } else {
                 $endpoints[] = $value;
             }
@@ -342,7 +345,7 @@ class TeslaPowerwallLocal extends IPSModule
                     // Flag for upper case names?
                     $upper = $this->ReadPropertyBoolean('UppercaseMode');
                     // Update variables
-                    $this->CreateVariablesFromJson($params, $call['Restore'], $upper);
+                    $this->CreateVariablesFromJson($params, $call['Restore'], $upper, $call['Prefix']);
                 }
             }
         }

@@ -22,6 +22,8 @@
             "Endpoints documentation": "Dokumentation der Endpunkte",
             "Update interval:": "Aktualisierungsintervall:",
             "Instantaneous readings from the CT clamps": "Momentane Messwerte von den CT-Klemmen",
+            "Detailed information about the solar specific meter": "Detaillierte Informationen über den solarspezifischen Zähler",
+            "Detailed information about the site specific meter": "Detaillierte Informationen über den standortspezifischen Zähler",
             "High-level information about the location and the network to which the Powerwall is connected": "Grundlegende Informationen über den Standort und das Netzwerk, an das die Powerwall angeschlossen ist",
             "Powerwall charged percentage": "Prozentualer Ladezustand der Powerwall",
             "Advanced settings ...": "Erweiterte Einstellungen ...",

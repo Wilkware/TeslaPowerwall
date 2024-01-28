@@ -75,6 +75,10 @@
                     "delete": false,
                     "changeOrder": false,
                     "rowCount": 5,
+                    "sort": {
+                        "column": "Endpoint",
+                        "direction": "ascending"
+                    },
                     "columns": [
                         {
                             "name": "Query",
@@ -95,7 +99,13 @@
                             "name": "Method",
                             "caption": "Method:",
                             "save": true,
-                            "width": "75px"
+                            "visible": false
+                        },
+                        {
+                            "name": "Prefix",
+                            "caption": "Prefix:",
+                            "save": true,
+                            "visible": false
                         },
                         {
                             "name": "Restore",
@@ -109,7 +119,7 @@
                         {
                             "name": "Description",
                             "caption": "Description:",
-                            "save": true,
+                            "save": false,
                             "width": "auto"
                         }
                     ]
