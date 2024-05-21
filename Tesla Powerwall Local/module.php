@@ -46,6 +46,7 @@ class TeslaPowerwallLocal extends IPSModule
         ['Query' => false, 'Endpoint' => '/meters/site',       'Method'=> 'GET', 'Prefix' => 'site_',  'Restore' => true, 'Description'=> 'Detailed information about the site specific meter'],
         ['Query' => false, 'Endpoint' => '/meters/solar',      'Method'=> 'GET', 'Prefix' => 'solar_', 'Restore' => true, 'Description'=> 'Detailed information about the solar specific meter'],
         ['Query' => false, 'Endpoint' => '/site_info',         'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'High-level information about the location and the network to which the Powerwall is connected'],
+        ['Query' => false, 'Endpoint' => '/system_status',     'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'Provides information on batteries and inverters'],
         ['Query' => false, 'Endpoint' => '/system_status/soe', 'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'Powerwall charged percentage'],
     ];
 

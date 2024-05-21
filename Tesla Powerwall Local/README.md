@@ -1,10 +1,10 @@
 # Tesla Energiespeicher (Lokal)
 
-[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.2.20230128-orange.svg)](https://github.com/Wilkware/TeslaPowerwall)
-[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Actions](https://github.com/Wilkware/TeslaPowerwall/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/TeslaPowerwall/actions)
+[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.3.20240318-orange.svg?style=flat-square)](https://github.com/Wilkware/TeslaPowerwall)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/TeslaPowerwall/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/TeslaPowerwall/actions)
 
 Das Modul bietet die Möglichkeit, mit einer Tesla Powerwall (Energiespeicher) über die lokale Netzwerk-API zu kommunizieren.  
 
@@ -91,6 +91,13 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 Das Modul stellt keine direkten Funktionsaufrufe zur Verfügung.
 
 ### 8. Versionshistorie
+
+v1.3.20240318
+
+* _NEU_: API-Endpunkt hinzugefügt (/system_status)
+* _FIX_: Dokumentation überarbeitet
+* _FIX_: Interne Bibliotheken überarbeitet
+* _FIX_: Internes Deployment überarbeitet
 
 v1.2.20240128
 

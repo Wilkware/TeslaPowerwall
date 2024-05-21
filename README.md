@@ -1,8 +1,8 @@
 # Tesla Energiespeicher (Tesla Powerwall)
 
-[![Version](https://img.shields.io/badge/Symcon-PHP--Bibliothek-purple.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg)](https://www.symcon.de/produkt/)
-[![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Version](https://img.shields.io/badge/Symcon-PHP--Bibliothek-purple.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 IP-Symcon Modulbibliothek für das Abrufen von aktuellen Energie-Daten eines Tesla Energiespeichers (Tesla Powerwall).  
 Die Bibliothek startet mit dem lokalen API-Inteface. Ein Modul zur Nutzung der Cloud-API ist in Vorbereitung.

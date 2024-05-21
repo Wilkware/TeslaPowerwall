@@ -175,12 +175,6 @@ if (!defined('IS_ACTIVE')) {
     define('IS_EBASE', 200);                                    // Default errorcode
     define('IS_NOTCREATED', IS_EBASE + 1);                      // Instance could not be created
 }
-if (!defined('vtBoolean')) {
-    define('vtBoolean', 0);
-    define('vtInteger', 1);
-    define('vtFloat', 2);
-    define('vtString', 3);
-}
 
 /**
  * Include all helper trait classes.
