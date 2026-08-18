@@ -4,7 +4,7 @@
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
 [![Version](https://img.shields.io/badge/Modul%20Version-1.4.20240528-orange.svg?style=flat-square)](https://github.com/Wilkware/TeslaPowerwall)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/TeslaPowerwall/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/TeslaPowerwall/actions)
+[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/TeslaPowerwall/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/TeslaPowerwall/actions)
 
 Das Modul bietet die Möglichkeit, mit einer Tesla Powerwall (Energiespeicher) über die lokale Netzwerk-API zu kommunizieren.  
 

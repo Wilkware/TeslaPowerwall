@@ -2,45 +2,55 @@
 
 declare(strict_types=1);
 
-// Allgemeine Funktionen
+/** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
+/** Namespaced traits */
+use Wilkware\TeslaPowerwall\DebugHelper;
+use Wilkware\TeslaPowerwall\FormatHelper;
+
 /**
- * CLASS UserMap
+ * CLASS Tesla Powerwall Local
  */
-class TeslaPowerwallLocal extends IPSModule
+class TeslaPowerwallLocal extends IPSModuleStrict
 {
+    // -------------------------------------------------------------------------
+    // Traits
+    // -------------------------------------------------------------------------
+
     use DebugHelper;
     use FormatHelper;
-    use ProfileHelper;
-    use TeslaHelper;
-    use VariableHelper;
 
-    // Echo maps
+    // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
+
+    /** @var int Min IPS Object ID  */
+    private const IPS_MIN_ID = 10000;
+
+    // -------------------------------------------------------------------------
+    // ECHO Maps
+    // -------------------------------------------------------------------------
+
+    /**
+     * @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map STATUS
+     */
     private const TELSA_MAP_STATUS = [
-        ['din', 'Gateway', 3], // '1152100-13-J--CN322130G3J04Q',
-        ['start_time', 'Start time', 4], // '2023-11-09 12:02:20 +0800',
-        ['up_time_seconds', 'Uptime', 3], // '1679h44m47.488908756s',
-        ['is_new', 'Is new', 0], // false,
-        ['version', 'Version', 3], // '23.28.2 27626f98',
-        // ['git_hash', '', 5], // '27626f98a66cad5c665bbe1d4d788cdb3e94fd33',
-        ['commission_count', 'Commission count', 1], // 0,
-        ['device_type', 'Device type', 3], //'teg',
-        ['teg_type', 'TEQ type', 3], //'unknown',
-        ['sync_type', 'Sync type', 3], //'v2.1',
-        ['cellular_disabled', 'Cellular disabled', 0], //false,
-        ['can_reboot', 'Can reboot', 0], //true
+        ['din', 'Gateway', 3, null], // '1152100-13-J--CN322130G3J04Q',
+        ['start_time', 'Start time', 4, null], // '2023-11-09 12:02:20 +0800',
+        ['up_time_seconds', 'Uptime', 3, null], // '1679h44m47.488908756s',
+        ['is_new', 'Is new', 0, null], // false,
+        ['version', 'Version', 3, null], // '23.28.2 27626f98',
+        // ['git_hash', '', 5, null], // '27626f98a66cad5c665bbe1d4d788cdb3e94fd33',
+        ['commission_count', 'Commission count', 1, null], // 0,
+        ['device_type', 'Device type', 3, null], //'teg',
+        ['teg_type', 'TEQ type', 3, null], //'unknown',
+        ['sync_type', 'Sync type', 3, null], //'v2.1',
+        ['cellular_disabled', 'Cellular disabled', 0, null], //false,
+        ['can_reboot', 'Can reboot', 0, null], //true
     ];
 
-    // Form Elements Positions
-    private const ELEM_IMAGE = 0;
-    private const ELEM_LABEL = 1;
-    private const ELEM_ACCOUNT = 2;
-    private const ELEM_DEVICE = 3;
-    private const ELEM_DATA = 4;
-    private const ELEM_ADVANCED = 5;
-
-    // API Endpoints (see https://github.com/vloschiavo/powerwall2)
+    /** @var array<int,mixed> API Endpoints (see https://github.com/vloschiavo/powerwall2) */
     private static $API_ENDPOINTS = [
         ['Query' => true,  'Endpoint' => '/meters/aggregates', 'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'Instantaneous readings from the CT clamps'],
         ['Query' => false, 'Endpoint' => '/meters/site',       'Method'=> 'GET', 'Prefix' => 'site_',  'Restore' => true, 'Description'=> 'Detailed information about the site specific meter'],
@@ -50,22 +60,34 @@ class TeslaPowerwallLocal extends IPSModule
         ['Query' => false, 'Endpoint' => '/system_status/soe', 'Method'=> 'GET', 'Prefix' => '',      'Restore' => true, 'Description'=> 'Powerwall charged percentage'],
     ];
 
+    // -------------------------------------------------------------------------
+    // Methods
+    // -------------------------------------------------------------------------
+
     /**
-     * Overrides the internal IPSModule::Create($id) function
+     * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
+     * Therefore, status variables and module properties which the module requires permanently should be created here.
+     *
+     * @return void
      */
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
+
         // The auth token is provided in the response to a successful login.
         $this->RegisterAttributeString('AuthToken', '');
+
         // The cookie file name.
         $this->RegisterAttributeString('CookieFile', @tempnam('/tmp', 'tpwl.'));
+
         // Account
         $this->RegisterPropertyString('Mail', '');
         $this->RegisterPropertyString('Password', '');
+
         // Device
         $this->RegisterPropertyString('Gateway', '127.0.0.1');
+
         // Data
         $this->RegisterPropertyString('Endpoints', '[]');
         $this->RegisterPropertyInteger('UpdateInterval', 5);
@@ -73,54 +95,69 @@ class TeslaPowerwallLocal extends IPSModule
         // Advanced
         $this->RegisterPropertyBoolean('UppercaseMode', true);
         $this->RegisterPropertyInteger('CookieLifetime', 60);
+
         // Register cookie update timer
         $this->RegisterTimer('UpdateCookieTimer', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "refresh", "cookie");');
+
         // Register data update timer
         $this->RegisterTimer('UpdateDataTimer', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "update", "data");');
     }
 
     /**
-     * Overrides the internal IPSModule::Destroy($id) function
+     * This function is called when deleting the instance during operation and when updating via "Module Control".
+     * The function is not called when exiting IP-Symcon.
+     *
+     * @return void
      */
-    public function Destroy()
+    public function Destroy(): void
     {
         //Never delete this line!
         parent::Destroy();
     }
 
     /**
-     * Configuration Form.
+     * The content can be overwritten in order to transfer a self-created configuration page.
+     * This way, content can be generated dynamically.
+     * In this case, the "form.json" on the file system is completely ignored.
      *
-     * @return JSON configuration string.
+     * @return string Content of the configuration page.
      */
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+
         // Get Token
         $token = $this->ReadAttributeString('AuthToken');
+
         // Debug output
-        $this->SendDebug(__FUNCTION__, 'AuthToken: ' . $token);
+        $this->LogDebug(__FUNCTION__, 'AuthToken: ' . $token);
+
         // LoggedIn?
         if (!empty($token)) {
             $this->SetStatus(102);
         } else {
             $this->SetStatus(104);
         }
+
         //Only add default element if we do not have anything in persistence
         $endpoints = json_decode($this->ReadPropertyString('Endpoints'), true);
-        $form['elements'][self::ELEM_DATA]['items'][0]['values'] = $this->GetEndpointValues($endpoints);
-        //$this->SendDebug(__FUNCTION__, $form);
+        $form['elements'][4]['items'][0]['values'] = $this->GetEndpointValues($endpoints);
+
+        //$this->LogDebug(__FUNCTION__, $form);
         return json_encode($form);
     }
 
     /**
-     * Overrides the internal IPSModule::ApplyChanges($id) function
+     * Is executed when "Apply" is pressed on the configuration page and immediately after the instance has been created.
+     *
+     * @return void
      */
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Never delete this line!
         parent::ApplyChanges();
+
         // Safty Check something changed
         $heartbeat = 0;
         $updatedata = 0;
@@ -131,8 +168,10 @@ class TeslaPowerwallLocal extends IPSModule
             // Update Data
             $updatedata = $this->ReadPropertyInteger('UpdateInterval');
         }
+
         // Timer ?
         $this->SetTimerInterval('UpdateDataTimer', 60 * 1000 * $updatedata);
+
         // only if updata data longer than lifetime
         if (($updatedata > 0) && ($heartbeat > $updatedata)) {
             $heartbeat = 0;
@@ -141,15 +180,17 @@ class TeslaPowerwallLocal extends IPSModule
     }
 
     /**
-     * RequestAction.
+     * Is called when, for example, a button is clicked in the visualization.
      *
-     *  @param string $ident Ident.
-     *  @param string $value Value.
+     * @param string $ident Ident of the variable
+     * @param mixed $value The value to be set
+     *
+     * @return void
      */
-    public function RequestAction($ident, $value)
+    public function RequestAction(string $ident, mixed $value): void
     {
         // Debug output
-        $this->SendDebug(__FUNCTION__, $ident . ' => ' . $value);
+        $this->LogDebug(__FUNCTION__, $ident . ' => ' . $value);
         switch ($ident) {
             case 'login':
                 $this->Login($value);
@@ -170,16 +211,16 @@ class TeslaPowerwallLocal extends IPSModule
                 // ERROR!!!
                 break;
         }
-        return true;
     }
 
     /**
      * Get endpoint values for form list
      *
-     * @param mixed $endpoints registered endpoint list
-     * @return array List values
+     * @param array<int,mixed> $endpoints registered endpoint list
+     *
+     * @return array<int,mixed> List values
      */
-    protected function GetEndpointValues($endpoints)
+    protected function GetEndpointValues(array $endpoints): array
     {
         $cols = array_column($endpoints, 'Endpoint');
         foreach (self::$API_ENDPOINTS as $value) {
@@ -200,16 +241,19 @@ class TeslaPowerwallLocal extends IPSModule
      * Login to the gateway.
      *
      * @param string $value context info
+     *
      * @return bool true if successful, otherwise false.
      */
-    private function Login($value)
+    private function Login(string $value): bool
     {
         // Display feedback massage
         $info = ($value == 'info');
         $ret = false;
+
         // Crfedentials
         $mail = $this->ReadPropertyString('Mail');
         $password = $this->ReadPropertyString('Password');
+
         // Safty check
         if (empty($mail)) {
             $this->SetStatus(201);
@@ -221,25 +265,27 @@ class TeslaPowerwallLocal extends IPSModule
             if ($info) $this->EchoMessage('Login not possible!');
             return $ret;
         }
+
         // API call
         $body = [];
         $body['username'] = 'customer';
         $body['email'] = $mail;
         $body['password'] = $password;
         $request = json_encode($body);
-        $this->SendDebug(__FUNCTION__, 'Request: ' . $request);
+        $this->LogDebug(__FUNCTION__, 'Request: ' . $request);
         $response = $this->Request('/login/Basic', true, $request);
         $text = 'Login was not successfull!';
+
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
+            $this->LogDebug(__FUNCTION__, $params);
             if (isset($params['token'])) {
                 $this->SetStatus(102);
                 $ret = true;
                 $text = 'Login was successfull!';
                 // AuthToken
-                $this->SendDebug(__FUNCTION__, 'Token: ' . $params['token']);
+                $this->LogDebug(__FUNCTION__, 'Token: ' . $params['token']);
                 $this->WriteAttributeString('AuthToken', $params['token']);
             } else {
                 $this->SetStatus(104);
@@ -248,6 +294,7 @@ class TeslaPowerwallLocal extends IPSModule
                 }
             }
         }
+
         // Return
         if ($info) $this->EchoMessage($text);
         return $ret;
@@ -257,52 +304,62 @@ class TeslaPowerwallLocal extends IPSModule
      * Logout from the gateway server.
      *
      * @param string $value context info
-     * @return True if successful, otherwise false.
+     *
+     * @return bool True if successful, otherwise false.
      */
-    private function Logout($value)
+    private function Logout(string $value): bool
     {
         // Display feedback massage
         $info = ($value == 'info');
+
         // Exist Auth Token?
         $token = $this->ReadAttributeString('AuthToken');
+
         // Safty check
         if (empty($token)) {
-            $this->SendDebug(__FUNCTION__, 'Token: ' . $token);
-            if ($info) echo $this->EchoMessage('Logout not possible!');
+            $this->LogDebug(__FUNCTION__, 'Token: ' . $token);
+            if ($info) $this->EchoMessage('Logout not possible!');
             return false;
         }
+
         // Delete cookie
         $cookie = $this->ReadAttributeString('CookieFile');
         $result = unlink($cookie);
+
         // Result?
         if ($result !== false) {
             $this->WriteAttributeString('AuthToken', '');
             $this->SetStatus(104);
-            if ($info) echo $this->EchoMessage('Logout was successfull!');
+            if ($info) $this->EchoMessage('Logout was successfull!');
         } else {
-            if ($info) echo $this->EchoMessage('Logout was not successfull!');
+            if ($info) $this->EchoMessage('Logout was not successfull!');
             return false;
         }
         return true;
     }
 
     /**
-     * Device Status
+     * Display Device Status
      *
+     * @param string $value Status value
+     *
+     * @return void
      */
-    private function Status($value)
+    private function Status(string $value): void
     {
         // Display feedback massage
         $info = ($value == 'info');
         $response = $this->Request('/status', false, null);
         $text = 'Error when calling the function!';
+
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
+            $this->LogDebug(__FUNCTION__, $params);
             $text = $this->PrettyPrint(self::TELSA_MAP_STATUS, $params);
         }
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
+
         // Return
         if ($info) $this->EchoMessage($text);
     }
@@ -310,36 +367,41 @@ class TeslaPowerwallLocal extends IPSModule
     /**
      * Refresh cookie
      *
+     * @param string $value Unused Value
+     *
+     * @return void
      */
-    private function Refresh($value)
+    private function Refresh(string $value): void
     {
         $response = $this->Request('/customer', false, null);
         $text = 'Error when calling the function!';
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
+            $this->LogDebug(__FUNCTION__, $params);
         }
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
     }
 
     /**
      * Update data call
      *
      * @param string $value Internal value
+     *
+     * @return void
      */
-    private function Update($value)
+    private function Update($value): void
     {
         // Check instance state
         if ($this->GetStatus() != 102) {
-            $this->SendDebug(__FUNCTION__, 'Status: Instance is not active.');
+            $this->LogDebug(__FUNCTION__, 'Status: Instance is not active.');
             return;
         }
         $endpoints = json_decode($this->ReadPropertyString('Endpoints'), true);
         foreach ($endpoints as $call) {
             if ($call['Query']) {
                 $response = $this->Request($call['Endpoint'], false, null);
-                $this->SendDebug(__FUNCTION__, $response);
+                $this->LogDebug(__FUNCTION__, $response);
                 // Result?
                 if ($response !== false) {
                     $params = json_decode($response, true);
@@ -353,14 +415,16 @@ class TeslaPowerwallLocal extends IPSModule
     }
 
     /**
-     * Create and update variables from json structure/response.
+     * Create and update variables from JSON structure/response.
      *
-     * @param JSON $json Json response answer
+     * @param array<string, mixed> $json JSON response data
      * @param bool $restore Indicator to restore deleted variables (reregister)
      * @param bool $case Indicator to upper case variable names
-     * @param string $prefix Prefix fpr each variable name
+     * @param string $prefix Prefix for each variable name
+     *
+     * @return void
      */
-    private function CreateVariablesFromJson($json, $restore, $case, $prefix = '')
+    private function CreateVariablesFromJson(array $json, bool $restore, bool $case, string $prefix = ''): void
     {
         // Go through the values
         foreach ($json as $key => $value) {
@@ -379,7 +443,7 @@ class TeslaPowerwallLocal extends IPSModule
             $ident = $this->GetVariableIdent($name);
             // Check, if variable exist
             $vid = @$this->GetIDForIdent($ident);
-            if (($vid === false) && $restore) {
+            if (($vid < self::IPS_MIN_ID) && $restore) {
                 $type = $this->GetVariableType($value);
                 switch ($type) {
                     case 0: // boolean
@@ -395,7 +459,7 @@ class TeslaPowerwallLocal extends IPSModule
                         $vid = $this->RegisterVariableString($ident, $name);
                         break;
                     default:
-                        $this->SendDebug(__FUNCTION__, 'Unknown type for ' . $name);
+                        $this->LogDebug(__FUNCTION__, 'Unknown type for ' . $name);
                         break;
                 }
             }
@@ -406,7 +470,7 @@ class TeslaPowerwallLocal extends IPSModule
         }
     }
 
-    /*
+    /**
      * Request - Sends the request to the device
      *
      * If $request not null, we will send a POST request, else a GET request.
@@ -414,12 +478,12 @@ class TeslaPowerwallLocal extends IPSModule
      *
      * @param string $endpoint api endpoint to call
      * @param string $request Request data
-     * @param string $mehtod 'GET' od 'POST'
-     * @return mixed response data or false.
+     * @param string $method 'GET' or 'POST'
+     *
+     * @return string|bool response data or false.
      */
-    private function Request(string $endpoint, bool $login, ?string $request, string $method = 'GET')
+    private function Request(string $endpoint, bool $login, ?string $request, string $method = 'GET'): string|bool
     {
-        //$this->SendDebug(__FUNCTION__, $endpoint, 0);
         // header
         $headers = [
             'Content-Type: application/json',
@@ -428,9 +492,11 @@ class TeslaPowerwallLocal extends IPSModule
         $cookie = $this->ReadAttributeString('CookieFile');
         // URL
         $gateway = $this->ReadPropertyString('Gateway');
+
         // API Base URL
         $url = 'https://' . $gateway . '/api' . $endpoint;
-        $this->SendDebug(__FUNCTION__, $url);
+        $this->LogDebug(__FUNCTION__, $url);
+
         // prepeare curl call
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -439,7 +505,7 @@ class TeslaPowerwallLocal extends IPSModule
         } else {
             curl_setopt($curl, CURLOPT_COOKIEFILE, $cookie);
         }
-        $this->SendDebug(__FUNCTION__, $cookie);
+        $this->LogDebug(__FUNCTION__, $cookie);
         if ($request != null) {
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($curl, CURLOPT_POSTFIELDS, $request);
@@ -448,25 +514,63 @@ class TeslaPowerwallLocal extends IPSModule
         }
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        //curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
         if (!$response = curl_exec($curl)) {
             $error = sprintf('Request failed for URL: %s - Error: %s', $url, curl_error($curl));
-            $this->SendDebug(__FUNCTION__, $error, 0);
+            $this->LogDebug(__FUNCTION__, $error);
         }
         curl_close($curl);
-        $this->SendDebug(__FUNCTION__, $response, 0);
+        $this->LogDebug(__FUNCTION__, $response);
         return $response;
+    }
+
+    /**
+     * Help function to determine the Symcon variable type from json value
+     *
+     * @param mixed $value JSON value
+     *
+     * @return int Symcon variable type, default string(3)
+     */
+    private function GetVariableType($value)
+    {
+        if (is_bool($value)) {
+            return 0; // Boolean
+        } elseif (is_int($value)) {
+            return 1; // Integer
+        } elseif (is_float($value)) {
+            return 2; // Float
+        } else {
+            return 3; // String
+        }
+    }
+
+    /**
+     * Generates an IPS-compliant IDENT from the transferred name
+     *
+     * @param string $name Name for the variable ident
+     *
+     * @return string Ident
+     */
+    private function GetVariableIdent($name)
+    {
+        $umlaute = ['/ä/', '/ö/', '/ü/', '/Ä/', '/Ö/', '/Ü/', '/ß/'];
+        $replace = ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue', 'ss'];
+        $ident = preg_replace($umlaute, $replace, $name);
+        // idents always lowercase?!?
+        $ident = strtolower($ident);
+        return preg_replace('/[^a-z0-9_]+/i', '', $ident);
     }
 
     /**
      * Show message via popup
      *
      * @param string $caption echo message
+     *
+     * @return void
      */
-    private function EchoMessage(string $caption)
+    private function EchoMessage(string $caption): void
     {
         $this->UpdateFormField('EchoMessage', 'caption', $this->Translate($caption));
         $this->UpdateFormField('EchoPopup', 'visible', true);
