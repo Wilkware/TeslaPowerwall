@@ -1,5 +1,6 @@
 # Tesla Energiespeicher (Lokal)
 
+[![Home](https://img.shields.io/badge/Home-wilkware.de-0b1830.svg?style=flat-square)](https://wilkware.de/module/tesla-energiespeicher/lokal/)
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
 [![Version](https://img.shields.io/badge/Modul%20Version-1.4.20240528-orange.svg?style=flat-square)](https://github.com/Wilkware/TeslaPowerwall)
@@ -13,11 +14,12 @@ Das Modul bietet die Möglichkeit, mit einer Tesla Powerwall (Energiespeicher) �
 1. [Funktionsumfang](#user-content-1-funktionsumfang)
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
-4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
-6. [Visualisierung](#user-content-6-visualisierung)
-7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
-8. [Versionshistorie](#user-content-8-versionshistorie)
+4. [Einrichtung](#user-content-4-einrichtung)
+5. [Statusvariablen](#user-content-5-statusvariablen)
+6. [Darstellungen](#user-content-6-darstellungen)
+7. [Visualisierung](#user-content-7-visualisierung)
+8. [Befehlsreferenz](#user-content-8-befehlsreferenz)
+9. [Versionshistorie](#user-content-9-versionshistorie)
 
 ### 1. Funktionsumfang
 
@@ -27,15 +29,15 @@ Die Anzahl an auswählbaren Endpunkten wird sukzessive erweitert.
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.4
+* Symcon ab Version 6.4
 
 ### 3. Installation
 
 * Über den Modul Store das Modul _Tesla Energiespeicher (Lokal)_ installieren.
-* Alternativ Über das Modul-Control folgende URL hinzufügen.  
+* Alternativ über das Modul Control folgende URL hinzufügen.  
 `https://github.com/Wilkware/TeslaPowerwall` oder `git://github.com/Wilkware/TeslaPowerwall.git`
 
-### 4. Einrichten der Instanzen in IP-Symcon
+### 4. Einrichtung
 
 * Unter 'Instanz hinzufügen' ist das _Tesla Energiespeicher (Lokal)_-Modul unter dem Hersteller 'Tesla' aufgeführt.
 
@@ -67,7 +69,7 @@ Aktualisierungsintervall           | Zeitspanne in Minuten für die wiederkehren
 
 Name                               | Beschreibung
 ---------------------------------- | -----------------------------------------------------------------
-Variablennamen in Großbuchstaben erzeugen! | Alle Datennamen konsequent in Großbustaben umwandeln.
+Variablennamen in Großbuchstaben erzeugen! | Alle Datennamen konsequent in Großbuchstaben umwandeln.
 Lebensdauer der Cookies           | Lebensdauer der Authentifizierung ohne jegliche Aktion
 
 _Aktionsbereich:_
@@ -78,19 +80,25 @@ ANMELDEN                | Am Gateway anmelden (LOGIN), erzeugt notwendiges Cooki
 ABMELDEN                | Abmelden vom System (löscht das Cookie)!
 STATUS                  | Zeigt einige Statusinformationen (kein Login notwendig!)
 
-### 5. Statusvariablen und Profile
+### 5. Statusvariablen
 
-Es werden entsprechend den ausgewählten Endpunkten Statusvariablen angelegt. VORSICHT: werden schnell viele Variablen!
+Die Statusvariablen werden entsprechend den ausgewählten Endpunkten automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
-### 6. Visualisierung
+_Hinweis:_ Vorsicht, es werden schnell viele Variablen!
+
+### 6. Darstellungen
+
+Es werden keine Darstellungen oder Profile benötigt.
+
+### 7. Visualisierung
 
 Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 
-### 7. PHP-Befehlsreferenz
+### 8. Befehlsreferenz
 
 Das Modul stellt keine direkten Funktionsaufrufe zur Verfügung.
 
-### 8. Versionshistorie
+### 9. Versionshistorie
 
 v1.4.20240528
 
@@ -122,7 +130,7 @@ v1.0.20240121
 
 ## Entwickler
 
-Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der IP-Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
+Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
 
 [![GitHub](https://img.shields.io/badge/GitHub-@wilkware-181717.svg?style=for-the-badge&logo=github)](https://wilkware.github.io/)
 

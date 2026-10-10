@@ -1,10 +1,11 @@
 # Tesla Energiespeicher (Tesla Powerwall)
 
+[![Home](https://img.shields.io/badge/Home-wilkware.de-0b1830.svg?style=flat-square)](https://wilkware.de/module/tesla-energiespeicher/)
 [![Version](https://img.shields.io/badge/Symcon-PHP--Bibliothek-purple.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
 [![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-IP-Symcon Modulbibliothek für das Abrufen von aktuellen Energie-Daten eines Tesla Energiespeichers (Tesla Powerwall).  
+Symcon Modulbibliothek für das Abrufen von aktuellen Energie-Daten eines Tesla Energiespeichers (Tesla Powerwall).  
 Die Bibliothek startet mit dem lokalen API-Inteface. Ein Modul zur Nutzung der Cloud-API ist in Vorbereitung.
 
 Folgende Module beinhaltet diese Bibliothek:
@@ -18,7 +19,7 @@ Folgende Module beinhaltet diese Bibliothek:
 
 ## Entwickler
 
-Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der IP-Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
+Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
 
 [![GitHub](https://img.shields.io/badge/GitHub-@wilkware-181717.svg?style=for-the-badge&logo=github)](https://wilkware.github.io/)
 
